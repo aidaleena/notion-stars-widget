@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+body{
+    margin:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+    background:transparent;
+    font-size:42px;
+    user-select:none;
+}
+.star{
+    color:#ccc;
+    cursor:pointer;
+    transition:.2s;
+}
+.star.active{
+    color:#FFD700;
+}
+</style>
+</head>
+<body>
+
+<div id="stars">
+    <span class="star" data-value="1">★</span>
+    <span class="star" data-value="2">★</span>
+    <span class="star" data-value="3">★</span>
+    <span class="star" data-value="4">★</span>
+    <span class="star" data-value="5">★</span>
+</div>
+
+<script>
+const stars = document.querySelectorAll('.star');
+let rating = localStorage.getItem('rating') || 0;
+
+function updateStars(value){
+    stars.forEach((star,i)=>{
+        star.classList.toggle('active', i < value);
+    });
+}
+
+updateStars(rating);
+
+stars.forEach(star=>{
+    star.onclick = ()=>{
+        rating = star.dataset.value;
+        localStorage.setItem('rating', rating);
+        updateStars(rating);
+    };
+});
+</script>
+
+</body>
+</html>
