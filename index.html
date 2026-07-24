@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Notion Star Rating</title>
+<style>
+html,body{
+  margin:0;
+  background:transparent;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  height:100%;
+  min-height:70px;
+  font-family:Arial,sans-serif;
+}
+#rating{
+  display:flex;
+  gap:4px;
+  cursor:pointer;
+  user-select:none;
+}
+.star{
+  position:relative;
+  font-size:42px;
+  line-height:1;
+  color:#cfcfcf;
+}
+.star .fill{
+  position:absolute;
+  left:0;
+  top:0;
+  overflow:hidden;
+  width:0%;
+  color:#FFD700;
+  white-space:nowrap;
+  pointer-events:none;
+}
+</style>
+</head>
+<body>
+<div id="rating"></div>
+
+<script>
+const STORAGE_KEY="rating";
+const container=document.getElementById("rating");
+let rating=parseFloat(localStorage.getItem(STORAGE_KEY));
+if(isNaN(rating)) rating=0;
+
+for(let i=1;i<=5;i++){
+  const s=document.createElement("span");
+  s.className="star";
+  s.dataset.star=i;
+  s.innerHTML='★<span class="fill">★</span>';
+  container.appendChild(s);
+}
+
+function render(value){
+  document.querySelectorAll(".star").forEach((star,i)=>{
+    const fill=star.querySelector(".fill");
+    const amt=Math.max(0,Math.min(1,value-i));
+    fill.style.width=(amt*100)+"%";
+  });
+}
+render(rating);
+
+container.addEventListener("mousemove",e=>{
+  const star=e.target.closest(".star");
+  if(!star) return;
+  const rect=star.getBoundingClientRect();
+  const idx=parseInt(star.dataset.star);
+  const half=(e.clientX-rect.left)<rect.width/2?0.5:1;
+  render(idx-1+half);
+});
+
+container.addEventListener("mouseleave",()=>render(rating));
+
+container.addEventListener("click",e=>{
+  const star=e.target.closest(".star");
+  if(!star) return;
+  const rect=star.getBoundingClientRect();
+  const idx=parseInt(star.dataset.star);
+  const half=(e.clientX-rect.left)<rect.width/2?0.5:1;
+  const newRating=idx-1+half;
+
+  if(newRating===rating){
+    rating=0;
+    localStorage.removeItem(STORAGE_KEY);
+  }else{
+    rating=newRating;
+    localStorage.setItem(STORAGE_KEY,rating);
+  }
+  render(rating);
+});
+</script>
+</body>
+</html>
